@@ -2,7 +2,11 @@ package core
 
 import (
 	"math"
+	"math/rand"
 	"testing"
+
+	"github.com/habedi/hann/core/distance"
+	"golang.org/x/sys/cpu"
 )
 
 // almostEqual compares two floating-point values with a tolerance.
@@ -61,7 +65,7 @@ func TestDistanceFunctions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange: set up test data (see above).
 			// Act: compute distances using the core package functions.
-			euclid := Euclidean(tt.a, tt.b)
+			euclid := distance.Euclidean(tt.a, tt.b)
 			sqEuclid := SquaredEuclidean(tt.a, tt.b)
 			manhattan := Manhattan(tt.a, tt.b)
 			cosine := CosineDistance(tt.a, tt.b)
@@ -84,5 +88,36 @@ func TestDistanceFunctions(t *testing.T) {
 					tt.expectedCosineDistance)
 			}
 		})
+	}
+}
+
+func TestDistanceFunctionsAVX2(t *testing.T) {
+	if !cpu.X86.HasAVX2 {
+		t.Skip("Skipping AVX2 test because CPU does not support AVX2")
+	}
+
+	len := 100000
+	a := make([]float32, len)
+	b := make([]float32, len)
+
+	random := rand.New(rand.NewSource(0)) // For reproducibility
+	for i := 0; i < len; i++ {
+		a[i] = random.Float32()
+		b[i] = random.Float32()
+	}
+
+	generic := distance.EuclideanGeneric(a, b)
+	avx2Computed := distance.Euclidean(a, b)
+	cgoDifference := EuclideanCgo(a, b)
+
+	t.Logf("AVX2 Computed: %f, Generic Computed: %f, Cgo Computed: %f", avx2Computed, generic, cgoDifference)
+
+	// Have a tolerance of 1e-3 since we're accumulating a lot of small values.
+	if !almostEqual(generic, avx2Computed, 1e-3) {
+		t.Errorf("AVX2 Euclidean distance mismatch: got %v, want %v", avx2Computed, generic)
+	}
+
+	if !almostEqual(avx2Computed, cgoDifference, 1e-3) {
+		t.Errorf("AVX2 Euclidean distance mismatch: got %v, want %v", avx2Computed, cgoDifference)
 	}
 }

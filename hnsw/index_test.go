@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/habedi/hann/core"
+	"github.com/habedi/hann/core/distance"
 	"github.com/habedi/hann/hnsw"
 )
 
@@ -40,7 +41,7 @@ func TestHNSWIndex_AddAndStats(t *testing.T) {
 
 func TestHNSWIndex_Delete(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: add two vectors.
 	if err := index.Add(1, []float32{1, 2, 3, 4, 5, 6}); err != nil {
@@ -69,7 +70,7 @@ func TestHNSWIndex_Delete(t *testing.T) {
 
 func TestHNSWIndex_Update(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: add a vector.
 	if err := index.Add(1, []float32{1, 2, 3, 4, 5, 6}); err != nil {
@@ -106,7 +107,7 @@ func TestHNSWIndex_Update(t *testing.T) {
 
 func TestHNSWIndex_BulkAdd(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: Create a set of 5 vectors.
 	vectors := map[int][]float32{
@@ -131,7 +132,7 @@ func TestHNSWIndex_BulkAdd(t *testing.T) {
 
 func TestHNSWIndex_BulkDelete(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: Bulk add a set of vectors.
 	vectors := map[int][]float32{
@@ -173,7 +174,7 @@ func TestHNSWIndex_BulkDelete(t *testing.T) {
 
 func TestHNSWIndex_BulkUpdate(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: Bulk add a set of vectors.
 	vectors := map[int][]float32{
@@ -207,7 +208,7 @@ func TestHNSWIndex_BulkUpdate(t *testing.T) {
 
 func TestHNSWIndex_SaveLoad(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 
 	// Arrange: add some vectors.
 	vectors := map[int][]float32{
@@ -239,7 +240,7 @@ func TestHNSWIndex_SaveLoad(t *testing.T) {
 	defer readFile.Close()
 
 	// Create a new index and load the saved state using the io.Reader.
-	newIndex := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	newIndex := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 	if err := newIndex.Load(readFile); err != nil {
 		t.Fatalf("Load failed: %v", err)
 	}
@@ -253,7 +254,7 @@ func TestHNSWIndex_SaveLoad(t *testing.T) {
 
 func TestHNSWIndex_ConcurrentBulkOperations(t *testing.T) {
 	dim := 6
-	index := hnsw.NewHNSW(dim, 5, 10, core.Euclidean, "euclidean")
+	index := hnsw.NewHNSW(dim, 5, 10, distance.Euclidean, "euclidean")
 	numVectors := 1000
 
 	// Arrange: prepare a map of vectors.

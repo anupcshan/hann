@@ -5,14 +5,16 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"github.com/habedi/hann/core"
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"math"
 	"math/rand"
 	"runtime"
 	"sort"
 	"sync"
+
+	"github.com/habedi/hann/core"
+	"github.com/habedi/hann/core/distance"
+	"github.com/schollz/progressbar/v3"
 )
 
 // NewRPTIndex creates a new RPT (Random Projection Tree) index.
@@ -32,7 +34,7 @@ func NewRPTIndex(
 		CandidateProjections: candidateProjections,
 		ParallelThreshold:    parallelThreshold,
 		ProbeMargin:          probeMargin,
-		Distance:             core.Euclidean, // default distance function
+		Distance:             distance.Euclidean, // default distance function
 		DistanceName:         "euclidean",
 	}
 }

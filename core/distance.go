@@ -8,12 +8,14 @@ package core
 import "C"
 import (
 	"unsafe"
+
+	"github.com/habedi/hann/core/distance"
 )
 
 // Distances is a map of human–readable names to distance functions.
 // You can use it to choose a distance metric by name.
 var Distances = map[string]DistanceFunc{
-	"euclidean":         Euclidean,
+	"euclidean":         distance.Euclidean,
 	"squared_euclidean": SquaredEuclidean,
 	"manhattan":         Manhattan,
 	"cosine":            CosineDistance,
@@ -26,7 +28,7 @@ var Distances = map[string]DistanceFunc{
 type DistanceFunc func(a, b []float32) float64
 
 // Euclidean computes the Euclidean (L2) distance between two vectors.
-func Euclidean(a, b []float32) float64 {
+func EuclideanCgo(a, b []float32) float64 {
 	if len(a) == 0 || len(b) == 0 {
 		panic("vectors must not be empty")
 	}

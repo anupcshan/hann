@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/habedi/hann/core"
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"math"
 	"math/rand"
 	"sort"
 	"sync"
+
+	"github.com/habedi/hann/core"
+	"github.com/habedi/hann/core/distance"
+	"github.com/schollz/progressbar/v3"
 )
 
 // seededRand is a global random number generator for random operations (e.g. during k-means).
@@ -76,7 +78,7 @@ func NewPQIVFIndex(dimension, coarseK, numSubquantizers, pqK, kMeansIters int) *
 		pqK:                  pqK,
 		kMeansIters:          kMeansIters,
 		idToCluster:          make(map[int]int),
-		Distance:             core.Euclidean,
+		Distance:             distance.Euclidean,
 		numCandidateClusters: 3,
 	}
 }
@@ -412,7 +414,7 @@ func (pq *PQIVFIndex) encodeVector(vector []float32, cluster int) ([]int, error)
 		best := -1
 		bestDist := math.MaxFloat64
 		for j, cent := range pq.codebooks[i] {
-			d := core.Euclidean(sub, cent)
+			d := distance.Euclidean(sub, cent)
 			if d < bestDist {
 				bestDist = d
 				best = j
@@ -504,7 +506,7 @@ func trainSubquantizer(data [][]float32, k int, iterations int) ([][]float32, er
 			best := -1
 			bestDist := math.MaxFloat64
 			for i, cent := range centroids {
-				d := core.Euclidean(point, cent)
+				d := distance.Euclidean(point, cent)
 				if d < bestDist {
 					bestDist = d
 					best = i
@@ -689,7 +691,7 @@ func (pq *PQIVFIndex) GobDecode(data []byte) error {
 			pq.idToCluster[entry.ID] = cluster
 		}
 	}
-	pq.Distance = core.Euclidean
+	pq.Distance = distance.Euclidean
 	return nil
 }
 
