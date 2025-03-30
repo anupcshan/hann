@@ -121,3 +121,25 @@ func TestDistanceFunctionsAVX2(t *testing.T) {
 		t.Errorf("AVX2 Euclidean distance mismatch: got %v, want %v", avx2Computed, cgoDifference)
 	}
 }
+
+func BenchmarkEuclideanAVX2(b *testing.B) {
+	if !cpu.X86.HasAVX2 {
+		b.Skip("Skipping AVX2 test because CPU does not support AVX2")
+	}
+
+	len := 8 * 1024
+	v1 := make([]float32, len)
+	v2 := make([]float32, len)
+	b.SetBytes(2 * int64(len) * 4) // 2 slices & 4 bytes per float32
+
+	random := rand.New(rand.NewSource(0)) // For reproducibility
+	for i := range len {
+		v1[i] = random.Float32()
+		v2[i] = random.Float32()
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		distance.Euclidean(v1, v2)
+	}
+}
